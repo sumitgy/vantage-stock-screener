@@ -29,7 +29,7 @@ function drawChart(){const chart=$('#chart'),data=state.history;if(!chart)return
 function openPosition(symbol){$('#position-symbol').value=symbol;$('#position-shares').value='';$('#position-cost').value=state.stocks.find(s=>s.symbol===symbol)?.price.toFixed(2)||'';$('#position-dialog').showModal()}
 function sellPosition(symbol){let p=state.positions.find(x=>x.symbol===symbol);if(!p){toast('No paper position to sell');return}if(confirm(`Remove your ${p.shares} share ${symbol} position?`)){state.positions=state.positions.filter(x=>x.symbol!==symbol);localStorage.setItem('vantage-positions',JSON.stringify(state.positions));renderPositions();toast(`${symbol} position closed`);}}
 function bind(){
-  $$('.nav-link').forEach(b=>b.onclick=()=>navigate(b.dataset.page));
+  $$('.nav-link:not(.api-docs-link)').forEach(b=>b.onclick=()=>navigate(b.dataset.page));
   $('#back-button').onclick=()=>navigate('screener');
   $('#refresh').onclick=()=>loadStocks();
   $('#sort-button').onclick=()=>{state.sort=state.sort==='desc'?'asc':'desc';$('#sort-button').textContent=`Sort page: Change ${state.sort==='desc'?'↓':'↑'}`;$('#change-header').innerHTML=`CHANGE <span>${state.sort==='desc'?'↓':'↑'}</span>`;renderTable()};
