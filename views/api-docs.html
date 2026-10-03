@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080d12">
+  <title>API Docs — Vantage Screener</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="docs-body">
+  <div class="app-shell">
+    <aside class="sidebar docs-sidebar">
+      <a class="brand" href="/"><span class="brand-mark">V<span>L</span></span><span><b>Vantage</b><small>SCREENER <i>V2</i></small></span></a>
+      <nav>
+        <a class="nav-link" href="/"><span>▥</span> Screener</a>
+        <a class="nav-link active" href="/api-docs.html"><span>⌘</span> API Docs</a>
+      </nav>
+      <div class="sidebar-bottom"><div class="avatar">VL</div><div><b>Equities Desk</b><small>Market workspace</small></div><span class="online-dot"></span></div>
+    </aside>
+    <main class="main-area">
+      <header class="topbar docs-topbar"><div class="market-status"><i class="live-dot"></i><span>VANTAGE API</span><span class="separator">·</span><span>REFERENCE</span></div><a class="soft-button docs-return" href="/">Back to screener</a></header>
+      <section class="page active docs-page">
+        <div class="page-heading"><div><div class="eyebrow">DEVELOPER REFERENCE <span class="live-label"><i></i> REST API</span></div><h1 id="docs-title">API Documentation</h1><p id="docs-note" class="subtitle">Loading API reference…</p></div></div>
+        <section class="panel docs-intro"><div class="docs-base-label">BASE PATH</div><code id="docs-base">/api</code><p>All endpoints use HTTP GET and return JSON. Market data may be delayed or rate-limited by upstream providers.</p></section>
+        <div id="docs-endpoints" class="docs-endpoints"><div class="panel docs-loading"><span class="spinner"></span> Loading endpoints…</div></div>
+        <section class="panel docs-upstream"><div class="panel-title"><span>UPSTREAM DATA SOURCES</span></div><div id="docs-providers" class="docs-providers"></div></section>
+        <p id="docs-error" class="docs-error" role="status"></p>
+      </section>
+    </main>
+  </div>
+  <script src="/api-docs.js" defer></script>
+</body>
+</html>
