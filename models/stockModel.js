@@ -1,4 +1,4 @@
-const stocks = [
+const knownStockMetadata = [
   ['AAPL', 'Apple Inc.', 'Tech'], ['MSFT', 'Microsoft Corporation', 'Tech'], ['NVDA', 'NVIDIA Corporation', 'Tech'],
   ['AMZN', 'Amazon.com, Inc.', 'Cons'], ['META', 'Meta Platforms, Inc.', 'Tech'], ['GOOGL', 'Alphabet Inc.', 'Tech'],
   ['TSLA', 'Tesla, Inc.', 'Cons'], ['AVGO', 'Broadcom Inc.', 'Tech'], ['JPM', 'JPMorgan Chase & Co.', 'Fin'],
@@ -11,15 +11,63 @@ const stocks = [
 
 const quoteCache = new Map();
 const yahooHeaders = { 'User-Agent': 'Mozilla/5.0 VantageScreener/1.0' };
+const directoryUrls = [
+  'https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt',
+  'https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt'
+];
+const directoryCacheMs = 12 * 60 * 60 * 1000;
+let directoryCache = null;
 
-function findStocks({ query = '', sector = 'All' } = {}) {
+function parseDirectory(text, isNasdaq) {
+  const lines = text.split(/\r?\n/);
+  const headers = lines.shift().split('|');
+  return lines.filter(line => line && !line.startsWith('File Creation Time:')).map(line => {
+    const fields = line.split('|');
+    const entry = Object.fromEntries(headers.map((header, index) => [header, fields[index] || '']));
+    const symbol = isNasdaq ? entry.Symbol : (entry['NASDAQ Symbol'] || entry['ACT Symbol']);
+    const name = entry['Security Name'].trim();
+    const exchangeCode = isNasdaq ? 'NASDAQ' : entry.Exchange;
+    const exchange = ({ N: 'NYSE', A: 'NYSE American', P: 'NYSE Arca', Z: 'Cboe', V: 'IEX' })[exchangeCode] || exchangeCode;
+    const excludedSecurity = /\b(?:warrants?|rights?|units?|preferred|notes?|debentures?|bonds?|funds?)\b/i.test(name);
+    if (!symbol || !name || entry['Test Issue'] === 'Y' || entry.ETF === 'Y' || excludedSecurity) return null;
+    return { symbol: symbol.trim(), name, sector: '—', exchange };
+  }).filter(Boolean);
+}
+
+async function getStockDirectory() {
+  if (directoryCache && Date.now() - directoryCache.at < directoryCacheMs) return directoryCache.data;
+  try {
+    const responses = await Promise.all(directoryUrls.map(url => fetch(url, { headers: { 'User-Agent': 'VantageScreener/1.0', Accept: 'text/plain' }, signal: AbortSignal.timeout(15000) })));
+    for (const response of responses) {
+      if (!response.ok) throw new Error(`Nasdaq Trader symbol directory returned ${response.status}`);
+    }
+    const [nasdaqText, otherText] = await Promise.all(responses.map(response => response.text()));
+    const sectors = new Map(knownStockMetadata.map(stock => [stock.symbol, stock.sector]));
+    const data = [...parseDirectory(nasdaqText, true), ...parseDirectory(otherText, false)]
+      .map(stock => ({ ...stock, sector: sectors.get(stock.symbol) || '—' }));
+    const unique = [...new Map(data.map(stock => [stock.symbol, stock])).values()].sort((a, b) => a.symbol.localeCompare(b.symbol));
+    if (!unique.length) throw new Error('Nasdaq Trader returned an empty stock directory');
+    directoryCache = { at: Date.now(), data: unique };
+    return unique;
+  } catch (error) {
+    if (directoryCache?.data?.length) return directoryCache.data;
+    throw error;
+  }
+}
+
+async function findStocks({ query = '', exchange = 'All', page = 1, pageSize = 20 } = {}) {
+  const directory = await getStockDirectory();
   const normalizedQuery = query.toLowerCase();
-  return stocks.filter(stock => (sector === 'All' || stock.sector === sector) &&
+  const primaryExchanges = ['NASDAQ', 'NYSE', 'NYSE American'];
+  const filtered = directory.filter(stock => (exchange === 'All' ||
+      (exchange === 'Other' ? !primaryExchanges.includes(stock.exchange) : stock.exchange === exchange)) &&
     (!normalizedQuery || stock.symbol.toLowerCase().includes(normalizedQuery) || stock.name.toLowerCase().includes(normalizedQuery)));
+  const offset = (page - 1) * pageSize;
+  return { data: filtered.slice(offset, offset + pageSize), total: filtered.length, page, pageSize };
 }
 
 function findStock(symbol) {
-  return stocks.find(stock => stock.symbol === symbol);
+  return knownStockMetadata.find(stock => stock.symbol === symbol);
 }
 
 async function getQuote(stock) {
@@ -42,7 +90,7 @@ async function getQuote(stock) {
   const change = price - previousClose;
   const data = {
     ...stock,
-    name: stock.name === '—' ? (meta.longName || meta.shortName || stock.symbol) : stock.name,
+    name: (!stock.name || stock.name === stock.symbol) ? (meta.longName || meta.shortName || stock.symbol) : stock.name,
     price,
     previousClose,
     change,
@@ -51,7 +99,7 @@ async function getQuote(stock) {
     dayHigh: meta.regularMarketDayHigh ?? null,
     dayLow: meta.regularMarketDayLow ?? null,
     currency: meta.currency || 'USD',
-    exchange: meta.exchangeName || '',
+    exchange: stock.exchange || meta.exchangeName || '',
     marketState: meta.marketState || 'UNKNOWN',
     timestamp: meta.regularMarketTime ? meta.regularMarketTime * 1000 : Date.now()
   };

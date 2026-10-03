@@ -6,12 +6,14 @@ const apiDocs = {
     {
       method: 'GET',
       path: '/api/stocks',
-      description: 'Lists the built-in screener symbols and their available quotes.',
+      description: 'Lists one page of active U.S. listed company stocks and their available quotes. The stock directory is built from Nasdaq Trader symbol files.',
       query: {
         q: 'Optional ticker or company-name filter.',
-        sector: 'Optional sector filter: All, Tech, Fin, Energy, Health, or Cons.'
+        exchange: 'Optional exchange filter: All, NASDAQ, NYSE, NYSE American, or Other.',
+        page: 'Optional 1-based page number; defaults to 1.',
+        pageSize: 'Optional number of symbols per page (1-100); defaults to 20.'
       },
-      response: '{ data: Quote[], errors: { symbol, message }[], updatedAt: number, provider: string }'
+      response: '{ data: (Quote | { symbol, name, price: null, quoteError })[], errors: { symbol, message }[], total: number, page: number, pageSize: number, updatedAt: number, provider: string }'
     },
     {
       method: 'GET',
@@ -44,6 +46,16 @@ const apiDocs = {
     }
   ],
   upstream: [
+    {
+      provider: 'Nasdaq Trader',
+      purpose: 'Nasdaq-listed company symbol directory; refreshed and cached by the server for up to 12 hours.',
+      url: 'https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt'
+    },
+    {
+      provider: 'Nasdaq Trader',
+      purpose: 'Other-exchange company symbol directory; refreshed and cached by the server for up to 12 hours.',
+      url: 'https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt'
+    },
     {
       provider: 'Yahoo Finance',
       purpose: 'Quote and chart data',

@@ -15,7 +15,7 @@ Open http://localhost:3000. To use another port, set the `PORT` environment vari
 
 ## Project structure
 
-- `models/stockModel.js` contains the ticker data and Yahoo Finance access.
+- `models/stockModel.js` loads a cached U.S. listed-company directory from Nasdaq Trader and fetches page quotes from Yahoo Finance.
 - `controllers/stockController.js` handles API requests and responses.
 - `routes/stockRoutes.js` maps API paths to controller functions.
 - `models/apiDocsModel.js`, `controllers/apiDocsController.js`, and `routes/apiDocsRoutes.js` define and serve the API reference at `GET /api/docs`.
@@ -25,8 +25,9 @@ Open http://localhost:3000. To use another port, set the `PORT` environment vari
 ## Data and features
 
 - Quote fields (price, daily change, volume, day high/low) and historical chart series are fetched live from Yahoo Finance. Quote refreshes are cached for 25 seconds and the UI refreshes about every 45 seconds.
-- The screener table starts with 20 large US tickers. Global ticker/company lookup can open additional symbols supported by Yahoo Finance; suffixes may be needed for some exchanges (for example, `.NS` for NSE listings).
-- Global lookup does not mean every listed company or exchange is covered. Yahoo Finance can omit symbols, delay quotes, throttle requests, or change its endpoints without notice.
+- The screener uses Nasdaq Trader's Nasdaq-listed and other-listed directories for active U.S. company symbols, excluding ETFs, test issues, funds, warrants, rights, units, preferred shares, and debt instruments. It shows 20 symbols per page and fetches quotes for the current page only.
+- Some directory symbols may not have a Yahoo Finance quote. Those symbols remain listed with unavailable quote values; Yahoo Finance may delay or throttle quote requests.
+- Global ticker/company lookup remains a separate Yahoo Finance search and can open other symbols supported by that provider.
 - Watchlist and paper positions are stored in this browser's local storage. Paper trades do not reach a broker.
 - Market cap, P/E, beta and 52-week values are not fabricated; unavailable fundamentals are shown as `â€”`.
 

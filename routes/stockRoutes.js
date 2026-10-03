@@ -9,4 +9,5 @@ router.get('/quote/:symbol', stockController.getQuote);
 router.get('/history/:symbol', stockController.getHistory);
 router.get('/health', stockController.healthCheck);
 
+
 module.exports = router;
