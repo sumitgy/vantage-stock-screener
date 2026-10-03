@@ -8,5 +8,7 @@ router.get('/search', stockController.searchStocks);
 router.get('/quote/:symbol', stockController.getQuote);
 router.get('/history/:symbol', stockController.getHistory);
 router.get('/health', stockController.healthCheck);
-
+router.get("/healthz", (req, res) => {
+    res.status(200).send("OK");
+});
 module.exports = router;
