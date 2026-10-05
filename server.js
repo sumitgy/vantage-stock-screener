@@ -1,5 +1,14 @@
 const express = require('express');
 const path = require('node:path');
+
+if (typeof process.loadEnvFile === 'function') {
+  try {
+    process.loadEnvFile(path.join(__dirname, '.env'));
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+}
+
 const stockRoutes = require('./routes/stockRoutes');
 const apiDocsRoutes = require('./routes/apiDocsRoutes');
 
@@ -11,6 +20,10 @@ app.disable('x-powered-by');
 // Render health check
 app.get('/healthz', (_req, res) => {
   res.status(200).send('OK');
+});
+
+app.get('/favicon.ico', (_req, res) => {
+  res.status(204).end();
 });
 
 app.use('/api', (_req, res, next) => {

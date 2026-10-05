@@ -6,3 +6,6 @@ services:
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /api/health
+    envVars:
+      - key: BHARATSTOCK_API_KEY
+        sync: false

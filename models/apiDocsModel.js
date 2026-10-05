@@ -1,30 +1,30 @@
 const apiDocs = {
   title: 'Vantage Screener API',
   basePath: '/api',
-  note: 'These are the routes implemented by this Node.js server. Market data is fetched from Yahoo Finance; endpoints may be delayed or rate-limited.',
+  note: 'Stock prices and company data are supplied by BharatStock and may be end of day.',
   endpoints: [
     {
       method: 'GET',
       path: '/api/stocks',
-      description: 'Lists one page of active U.S. listed company stocks and their available quotes. The stock directory is built from Nasdaq Trader symbol files.',
+      description: 'Lists one page of Indian stocks with BharatStock screener metrics and end-of-day prices.',
       query: {
         q: 'Optional ticker or company-name filter.',
-        exchange: 'Optional exchange filter: All, NASDAQ, NYSE, NYSE American, or Other.',
+        exchange: 'Optional exchange filter: All, NSE, or BSE.',
         page: 'Optional 1-based page number; defaults to 1.',
-        pageSize: 'Optional number of symbols per page (1-100); defaults to 20.'
+        pageSize: 'Optional number of symbols per page (1-50); defaults to 20.'
       },
       response: '{ data: (Quote | { symbol, name, price: null, quoteError })[], errors: { symbol, message }[], total: number, page: number, pageSize: number, updatedAt: number, provider: string }'
     },
     {
       method: 'GET',
       path: '/api/search?q={query}',
-      description: 'Searches Yahoo Finance symbols; an empty q returns an empty data array.',
+      description: 'Searches Indian stock symbols using BharatStock; an empty q returns an empty data array.',
       response: '{ data: { symbol, name, sector, exchange, currency, type }[], provider: string }'
     },
     {
       method: 'GET',
       path: '/api/quote/{symbol}',
-      description: 'Gets a quote for a ticker symbol.',
+      description: 'Gets the latest available BharatStock stock profile and price data.',
       response: '{ data: Quote, provider: string }'
     },
     {
@@ -35,9 +35,33 @@ const apiDocs = {
     },
     {
       method: 'GET',
+      path: '/api/fundamentals/{symbol}?period=annual',
+      description: 'Gets reported income, balance-sheet, or cash-flow statements from BharatStock. Set period to annual or quarterly.',
+      response: '{ symbol: string, period: string, data: { date: string, ...reportedValues }[], provider: string }'
+    },
+    {
+      method: 'GET',
+      path: '/api/ratios/{symbol}',
+      description: 'Gets valuation and profitability ratios from BharatStock.',
+      response: '{ symbol: string, data: object, provider: string }'
+    },
+    {
+      method: 'GET',
+      path: '/api/peers/{symbol}',
+      description: 'Gets sector peers with daily screener metrics from BharatStock.',
+      response: '{ symbol: string, sector: string, data: object[], provider: string }'
+    },
+    {
+      method: 'GET',
+      path: '/api/announcements/{symbol}',
+      description: 'Gets recent company announcements and filing links from NSE India.',
+      response: '{ symbol: string, data: { date, title, details, url }[], provider: string }'
+    },
+    {
+      method: 'GET',
       path: '/api/health',
       description: 'Reports that the API process is responding.',
-      response: '{ ok: true, provider: string }'
+      response: '{ ok: true, provider: string, configured: boolean }'
     },
     {
       method: 'GET',
@@ -47,24 +71,14 @@ const apiDocs = {
   ],
   upstream: [
     {
-      provider: 'Nasdaq Trader',
-      purpose: 'Nasdaq-listed company symbol directory; refreshed and cached by the server for up to 12 hours.',
-      url: 'https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt'
+      provider: 'BharatStock',
+      purpose: 'Indian stock listing, screener metrics, financial statements, ratios, search, and historical prices.',
+      url: 'https://bharatstockapi.com/v1'
     },
     {
-      provider: 'Nasdaq Trader',
-      purpose: 'Other-exchange company symbol directory; refreshed and cached by the server for up to 12 hours.',
-      url: 'https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt'
-    },
-    {
-      provider: 'Yahoo Finance',
-      purpose: 'Quote and chart data',
-      urlPattern: 'https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?range={range}&interval={interval}'
-    },
-    {
-      provider: 'Yahoo Finance',
-      purpose: 'Symbol search',
-      urlPattern: 'https://query1.finance.yahoo.com/v1/finance/search?q={query}&quotesCount=12&newsCount=0&enableFuzzyQuery=true'
+      provider: 'NSE India',
+      purpose: 'Company announcements and filing links.',
+      url: 'https://www.nseindia.com/api/corporate-announcements'
     }
   ]
 };
