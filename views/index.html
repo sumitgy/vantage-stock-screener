@@ -4,7 +4,11 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#080d12"><title>Vantage — Equity Screener</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<<<<<<< Updated upstream
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/styles.css">
+=======
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/styles.css?v=7">
+>>>>>>> Stashed changes
 </head>
 <body><div class="app-shell">
   <aside class="sidebar">
@@ -24,6 +28,10 @@
     <section id="page-positions" class="page"><div class="page-heading"><div><div class="eyebrow">PORTFOLIO TRACKER</div><h1>Positions</h1><p class="subtitle">Track a paper portfolio using current market quotes.</p></div><button id="add-position" class="primary-button">＋ Add position</button></div><div class="metric-grid" id="position-metrics"></div><div class="panel table-wrap"><div class="table-scroll"><table><thead><tr><th>SYMBOL</th><th class="numeric">SHARES</th><th class="numeric">AVG COST</th><th class="numeric">LAST</th><th class="numeric">MKT VALUE</th><th class="numeric">TOTAL P&amp;L</th><th></th></tr></thead><tbody id="position-rows"></tbody></table></div></div><p class="disclaimer">Paper portfolio only. No trades are placed.</p></section>
     <section id="page-reports" class="page"><div class="page-heading"><div><div class="eyebrow">MARKET SNAPSHOT</div><h1>Market Reports</h1><p class="subtitle" id="report-date">Based on quotes from the current screener page.</p></div></div><div class="reports-layout"><div class="panel report-panel"><div class="panel-title"><span>EXCHANGE PERFORMANCE</span><small>AVERAGE CHANGE</small></div><div id="sector-performance"></div><div class="divider"></div><div class="panel-title"><span>MARKET BREADTH</span></div><div id="breadth"></div></div><div class="report-side"><div class="panel report-panel"><div class="panel-title"><span>TOP GAINERS</span></div><div id="top-gainers"></div></div><div class="panel report-panel"><div class="panel-title"><span>TOP LOSERS</span></div><div id="top-losers"></div></div></div></div></section>
   </main>
+<<<<<<< Updated upstream
 </div><div id="toast" class="toast" role="status"></div><dialog id="position-dialog"><form method="dialog" id="position-form"><div class="dialog-head"><div><div class="eyebrow">PAPER PORTFOLIO</div><h2>Add a position</h2></div><button class="close-dialog" value="cancel" aria-label="Close">×</button></div><label>Ticker<input id="position-symbol" class="field" required placeholder="e.g. AAPL" maxlength="10"></label><div class="form-row"><label>Shares<input id="position-shares" class="field" type="number" min="0.001" step="any" required placeholder="10"></label><label>Average cost<input id="position-cost" class="field" type="number" min="0.01" step="any" required placeholder="150.00"></label></div><button class="primary-button submit-position" value="default">Add position</button></form></dialog><script src="/app.js" defer></script></body></html>
+=======
+</div><div id="toast" class="toast" role="status"></div><dialog id="position-dialog"><form method="dialog" id="position-form"><div class="dialog-head"><div><div class="eyebrow">PAPER PORTFOLIO</div><h2>Add a position</h2></div><button class="close-dialog" value="cancel" aria-label="Close">×</button></div><label>Ticker<input id="position-symbol" class="field" required placeholder="e.g. AAPL" maxlength="10"></label><div class="form-row"><label>Shares<input id="position-shares" class="field" type="number" min="0.001" step="any" required placeholder="10"></label><label>Average cost<input id="position-cost" class="field" type="number" min="0.01" step="any" required placeholder="150.00"></label></div><button class="primary-button submit-position" value="default">Add position</button></form></dialog><script src="/app.js?v=16" defer></script></body></html>
+>>>>>>> Stashed changes
 
 
